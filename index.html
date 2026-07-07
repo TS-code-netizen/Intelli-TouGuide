@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelli-TourGuide - Premium AI Travel Companion</title>
+  <meta name="description" content="Plan your dream itinerary with interactive audio storytelling, accommodation, food, transit, and cost guides.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="bg-glow"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="glass-panel" style="padding: 1rem 1.5rem; margin-top: 1rem; border-radius: var(--radius-md);">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span>IntelliGuide</span>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Saved Trips dropdown selection -->
+        <div class="saved-trips-container" id="savedTripsDropdown" style="display: none;">
+          <select id="savedTripsSelect" class="saved-trips-select select-dropdown" style="padding-right: 2rem;">
+            <option value="">-- Saved Trips --</option>
+          </select>
+        </div>
+        
+        <!-- Light / Dark theme toggle button -->
+        <button id="themeToggleBtn" class="btn-icon" aria-label="Toggle Theme">
+          <svg id="themeSunIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg id="themeMoonIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN LANDING VIEW -->
+    <main id="landingView">
+      <section class="hero-section">
+        <h1>Craft Your Next <span>Perfect Journey</span></h1>
+        <p>Enter your destination and let our AI curate a highly personalized day-by-day travel plan with local storytelling, food guides, and custom budget estimators.</p>
+      </section>
+
+      <!-- Search & Parameters Form -->
+      <form id="itineraryForm" class="glass-panel generator-form" onsubmit="event.preventDefault();">
+        <div class="form-grid">
+          <!-- Destination -->
+          <div class="form-group">
+            <label for="destinationInput">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Where to?
+            </label>
+            <input type="text" id="destinationInput" class="form-control" placeholder="e.g. Tokyo, Paris, Rome..." autocomplete="off" required>
+            <div id="autocompleteDropdown" class="autocomplete-suggestions" style="display: none;"></div>
+          </div>
+
+          <!-- Trip Duration -->
+          <div class="form-group">
+            <label for="durationInput">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              How many days?
+            </label>
+            <select id="durationInput" class="form-control select-dropdown">
+              <option value="1">1 Day</option>
+              <option value="2">2 Days</option>
+              <option value="3" selected>3 Days</option>
+              <option value="4">4 Days</option>
+              <option value="5">5 Days</option>
+              <option value="6">6 Days</option>
+              <option value="7">7 Days</option>
+            </select>
+          </div>
+
+          <!-- Budget Tier -->
+          <div class="form-group">
+            <label for="budgetInput">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              Budget Preference
+            </label>
+            <select id="budgetInput" class="form-control select-dropdown">
+              <option value="budget">Backpacker / Budget ($)</option>
+              <option value="mid" selected>Mid-range Explorer ($$)</option>
+              <option value="luxury">Luxury / Premium ($$$)</option>
+            </select>
+          </div>
+
+          <!-- Diet preferences -->
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              Dietary Needs
+            </label>
+            <div class="diet-select-container">
+              <span class="diet-pill" data-diet="Vegetarian">Vegetarian</span>
+              <span class="diet-pill" data-diet="Vegan">Vegan</span>
+              <span class="diet-pill" data-diet="Gluten-Free">Gluten-Free</span>
+              <span class="diet-pill" data-diet="Halal">Halal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Travel Vibes -->
+        <div class="form-group" style="margin-bottom: 2.5rem;">
+          <label style="margin-bottom: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.886H3.894l5.018 3.646L6.999 18.42l5.001-3.633 5.001 3.633-1.913-5.888 5.018-3.646h-6.194L12 3z"></path></svg>
+            What is your travel vibe?
+          </label>
+          <div class="vibe-grid">
+            <div class="vibe-pill active" data-vibe="culture">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5v-15Z"></path></svg>
+              Culture
+            </div>
+            <div class="vibe-pill" data-vibe="food">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              Foodie
+            </div>
+            <div class="vibe-pill" data-vibe="adventure">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path></svg>
+              Adventure
+            </div>
+            <div class="vibe-pill" data-vibe="relaxation">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              Relax
+            </div>
+            <div class="vibe-pill" data-vibe="family">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Family
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="generateBtn" class="btn-primary">
+          Generate Itinerary
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+    </main>
+
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen" class="loading-overlay">
+      <div class="loading-container glass-panel">
+        <div class="loader-glow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+        </div>
+        <h2 class="loading-title">AI is crafting your guide...</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Curating standard recommendations and calculating local expense schedules.</p>
+        
+        <div class="loading-status-list">
+          <div class="loading-step active" id="step1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Analyzing local public transit routes...</span>
+          </div>
+          <div class="loading-step" id="step2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Curating local storytelling highlights...</span>
+          </div>
+          <div class="loading-step" id="step3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Sourcing dining options & accommodations...</span>
+          </div>
+          <div class="loading-step" id="step4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Structuring budget breakdown matrices...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIP RESULT DASHBOARD -->
+    <div id="dashboardView" class="dashboard-container">
+      <!-- Back Button -->
+      <button id="backToHomeBtn" class="btn-icon" style="border-radius: var(--radius-sm); width: auto; height: auto; padding: 0.5rem 1rem; display: flex; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 1.5rem;" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Edit Preferences
+      </button>
+
+      <!-- Trip Overview Card -->
+      <section class="glass-panel trip-overview-card">
+        <div class="trip-overview-bg"></div>
+        <div class="trip-meta">
+          <div class="trip-title">
+            <h2 id="summaryDestName">Tokyo, Japan</h2>
+            <p id="summaryTagline">Where ancient traditions meet neon-lit futuristic technology.</p>
+          </div>
+          
+          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <div class="trip-stats">
+              <div class="stat-box">
+                <span class="stat-val" id="summaryDuration">3 Days</span>
+                <div class="stat-lbl">Duration</div>
+              </div>
+              <div class="stat-box">
+                <span class="stat-val" id="summaryCost">$850</span>
+                <div class="stat-lbl">Est. Total</div>
+              </div>
+              <div class="stat-box">
+                <span class="stat-val" id="summaryVibe" style="text-transform: capitalize;">Culture</span>
+                <div class="stat-lbl">Vibe</div>
+              </div>
+            </div>
+            
+            <button id="saveItineraryBtn" class="btn-primary" style="width: auto; padding: 0.75rem 1.25rem; font-size: 0.95rem; margin: 0; display: flex; gap: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Save Trip
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <nav class="tabs-navigation">
+        <button class="tab-btn active" data-tab="itineraryTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          Daily Schedule
+        </button>
+        <button class="tab-btn" data-tab="attractionsTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Attractions & Stories
+        </button>
+        <button class="tab-btn" data-tab="hotelsTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Accommodations
+        </button>
+        <button class="tab-btn" data-tab="foodTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Food & Dining
+        </button>
+        <button class="tab-btn" data-tab="transportTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+          Transport
+        </button>
+        <button class="tab-btn" data-tab="budgetTab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Budget Planner
+        </button>
+      </nav>
+
+      <!-- TAB CONTENT PANELS -->
+      
+      <!-- 1. ITINERARY TIMELINE PANEL -->
+      <div id="itineraryTab" class="tab-content active">
+        <div class="day-selector" id="daySelectorContainer">
+          <!-- Day Buttons will be dynamically inserted here -->
+        </div>
+        <div id="daysSchedulesContainer">
+          <!-- Day Timeline Wrappers will be dynamically inserted here -->
+        </div>
+      </div>
+
+      <!-- 2. ATTRACTIONS & AUDIO GUIDE PANEL -->
+      <div id="attractionsTab" class="tab-content">
+        <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Explore Attractions & Local Stories</h3>
+        <div class="attraction-grid" id="attractionsGridContainer">
+          <!-- Attraction Cards will be dynamically inserted here -->
+        </div>
+      </div>
+
+      <!-- 3. HOTELS PANEL -->
+      <div id="hotelsTab" class="tab-content">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Accommodations Sourced For You</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Recommended options matching your budget preference.</p>
+        <div class="suggestion-grid" id="hotelsGridContainer">
+          <!-- Hotel Cards will be dynamically inserted here -->
+        </div>
+      </div>
+
+      <!-- 4. FOOD & DINING PANEL -->
+      <div id="foodTab" class="tab-content">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Culinary Discoveries</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Signature dishes to try and recommended food spots.</p>
+        
+        <div style="margin-bottom: 2rem;">
+          <h4 style="margin-bottom: 1rem; color: var(--primary);">Must-Try Local Foods</h4>
+          <div class="suggestion-grid" id="dishesGridContainer">
+            <!-- Dishes Cards will be dynamically inserted here -->
+          </div>
+        </div>
+
+        <div>
+          <h4 style="margin-bottom: 1rem; color: var(--secondary);">Curated Dining Options</h4>
+          <div class="suggestion-grid" id="restaurantsGridContainer">
+            <!-- Restaurant Cards will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. TRANSPORT PANEL -->
+      <div id="transportTab" class="tab-content">
+        <div class="transport-layout">
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem;">Transit Mode Comparison</h3>
+            <div class="transport-table-wrapper">
+              <table class="transport-table">
+                <thead>
+                  <tr>
+                    <th>Transit Option</th>
+                    <th>Approx. Cost</th>
+                    <th>Speed</th>
+                    <th>Convenience</th>
+                    <th>Local Advise</th>
+                  </tr>
+                </thead>
+                <tbody id="transportTableBody">
+                  <!-- Transport rows will be dynamically inserted here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="glass-panel" style="padding: 1.5rem;" id="localTransportAdviceCard">
+            <!-- General transit advise will be added here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. BUDGET PLANNER PANEL -->
+      <div id="budgetTab" class="tab-content">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Interactive Expense Estimation</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Adjust the cost multipliers to test other budgeting strategies in real time.</p>
+        
+        <div class="cost-calculator-layout">
+          <!-- Donut Chart -->
+          <div class="glass-panel chart-container">
+            <h4 style="margin-bottom: 1.5rem;">Estimated Expense Allocation</h4>
+            <svg class="svg-donut" viewBox="0 0 200 200" id="budgetDonutChart">
+              <circle class="donut-hole" cx="100" cy="100" r="70"></circle>
+              <!-- Segments: stroke-dasharray and stroke-dashoffset calculated dynamically -->
+              <circle id="segLodging" class="donut-segment" cx="100" cy="100" r="70" stroke="#8b5cf6"></circle>
+              <circle id="segMeals" class="donut-segment" cx="100" cy="100" r="70" stroke="#ec4899"></circle>
+              <circle id="segTransport" class="donut-segment" cx="100" cy="100" r="70" stroke="#3b82f6"></circle>
+              <circle id="segAttractions" class="donut-segment" cx="100" cy="100" r="70" stroke="#10b981"></circle>
+              <circle id="segShopping" class="donut-segment" cx="100" cy="100" r="70" stroke="#f59e0b"></circle>
+              <!-- Center text -->
+              <g transform="rotate(90 100 100)">
+                <text x="100" y="95" class="donut-text-val" id="donutTotalVal">$0</text>
+                <text x="100" y="120" class="donut-text-lbl">Total Budget</text>
+              </g>
+            </svg>
+
+            <!-- Custom Legend -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; font-size: 0.85rem;">
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #8b5cf6; display: inline-block;"></span>Lodging</span>
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #ec4899; display: inline-block;"></span>Meals</span>
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #3b82f6; display: inline-block;"></span>Transit</span>
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #10b981; display: inline-block;"></span>Attractions</span>
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #f59e0b; display: inline-block;"></span>Shopping</span>
+            </div>
+          </div>
+
+          <!-- Adjusters Sliders -->
+          <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="calc-sliders">
+              <!-- Lodging slider -->
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Lodging Quality (per night)</span>
+                  <span id="lblLodging">$0</span>
+                </div>
+                <input type="range" id="sliderLodging" class="slider-control" min="0.5" max="3" step="0.1" value="1.0">
+              </div>
+
+              <!-- Meals slider -->
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Food Preference</span>
+                  <span id="lblMeals">$0</span>
+                </div>
+                <input type="range" id="sliderMeals" class="slider-control" min="0.5" max="3" step="0.1" value="1.0">
+              </div>
+
+              <!-- Transport slider -->
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Transport Mode</span>
+                  <span id="lblTransport">$0</span>
+                </div>
+                <input type="range" id="sliderTransport" class="slider-control" min="0.5" max="3" step="0.1" value="1.0">
+              </div>
+
+              <!-- Shopping slider -->
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Shopping & Extras</span>
+                  <span id="lblShopping">$0</span>
+                </div>
+                <input type="range" id="sliderShopping" class="slider-control" min="0" max="3" step="0.1" value="1.0">
+              </div>
+            </div>
+
+            <div class="total-summary-card">
+              <span style="font-size: 0.9rem; opacity: 0.85; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Estimated Custom Trip Budget</span>
+              <h3 id="lblTotalCalculated">$0</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border-card); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+      <p>&copy; 2026 Intelli-TourGuide. Designed for travel excellence. Harnessing advanced client intelligence.</p>
+    </footer>
+  </div>
+
+  <!-- Dynamic Success Toast Notifications -->
+  <div id="successToast" class="toast">
+    <svg class="toast-icon success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toastMessage">Itinerary saved successfully!</span>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
